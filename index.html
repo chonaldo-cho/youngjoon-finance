@@ -1,0 +1,348 @@
+<title>youngjoon.finance 랜딩페이지</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: 480px 단일 컬럼. 레드 히어로 밴드 → 흰 폼 카드가 밴드에 걸쳐 올라옴 → 조용한 푸터 */
+:root {
+  --red: #DA1F3D;
+  --red-deep: #B5162F;
+  --on-red: #FFFFFF;
+  --charcoal: #2C2C2C;
+  --bg: #F6F4F4;
+  --surface: #FFFFFF;
+  --fg: #2C2C2C;
+  --muted: #6E6668;
+  --line: #E4DEDF;
+  --field: #FBFAFA;
+  --error: #C8102E;
+  --error-bg: #FDECEF;
+  --font: 'Apple SD Gothic Neo', 'Malgun Gothic', -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1A1718; --surface: #242021; --fg: #F1ECED; --muted: #A89FA1;
+    --line: #3A3335; --field: #1E1A1B; --error: #FF6B81; --error-bg: #3A1C22;
+    --red-deep: #9E1229; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1A1718; --surface: #242021; --fg: #F1ECED; --muted: #A89FA1;
+  --line: #3A3335; --field: #1E1A1B; --error: #FF6B81; --error-bg: #3A1C22;
+  --red-deep: #9E1229; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font);
+  font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 480px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.band { background: var(--red); color: var(--on-red); }
+.band .wrap { padding-block: 18px 72px; }
+
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brand { font-weight: 800; font-size: 17px; letter-spacing: -0.01em; }
+.brand span { opacity: .75; font-weight: 600; }
+.sub { font-size: 12.5px; opacity: .85; letter-spacing: .02em; }
+
+.hero { padding-top: 40px; display: grid; gap: 14px; }
+.hero h1 {
+  margin: 0; font-size: clamp(27px, 7.4vw, 34px); line-height: 1.28;
+  font-weight: 800; letter-spacing: -0.03em; text-wrap: balance; word-break: keep-all;
+}
+.hero p { margin: 0; font-size: 15.5px; opacity: .92; word-break: keep-all; }
+.hero p b { font-weight: 700; border-bottom: 2px solid rgba(255,255,255,.55); }
+.badges { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.badges li {
+  font-size: 13px; font-weight: 600; padding: 6px 11px 6px 9px; border-radius: 999px;
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.28);
+  display: inline-flex; align-items: center; gap: 5px;
+}
+
+main .wrap { margin-top: -48px; padding-block: 0 8px; }
+.card {
+  background: var(--surface); border-radius: 18px; padding: 26px 20px 22px;
+  box-shadow: 0 10px 30px rgba(44,44,44,.10), 0 1px 0 var(--line);
+  animation: rise .55s cubic-bezier(.2,.7,.2,1) both;
+}
+@keyframes rise { from { transform: translateY(14px); opacity: .4; } to { transform: none; opacity: 1; } }
+
+.card h2 { margin: 0 0 4px; font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
+.card .lead { margin: 0 0 20px; color: var(--muted); font-size: 13.5px; }
+
+form { display: grid; gap: 16px; }
+.field { display: grid; gap: 6px; }
+label { font-size: 13.5px; font-weight: 700; }
+label .req { color: var(--red); margin-left: 2px; }
+input, select {
+  width: 100%; font: inherit; font-size: 16px; color: var(--fg);
+  background: var(--field); border: 1.5px solid var(--line); border-radius: 12px;
+  padding: 13px 14px; transition: border-color .15s, box-shadow .15s; appearance: none; -webkit-appearance: none;
+}
+select {
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 20px) 52%, calc(100% - 14px) 52%;
+  background-size: 6px 6px; background-repeat: no-repeat; padding-right: 40px;
+}
+select:invalid { color: var(--muted); }
+input::placeholder { color: var(--muted); opacity: .8; }
+input:focus, select:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(218,31,61,.16); }
+.field.bad input, .field.bad select { border-color: var(--error); background: var(--error-bg); }
+.msg { font-size: 12.5px; color: var(--error); font-weight: 600; min-height: 0; }
+.msg:empty { display: none; }
+.field.bad { animation: nudge .3s; }
+@keyframes nudge { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+.submit {
+  margin-top: 6px; width: 100%; border: 0; border-radius: 14px; cursor: pointer;
+  background: var(--red); color: var(--on-red); font: inherit; font-size: 17px; font-weight: 800;
+  padding: 17px 16px; letter-spacing: -0.01em;
+  box-shadow: 0 6px 16px rgba(218,31,61,.28);
+  transition: transform .15s, box-shadow .15s, background .15s;
+}
+.submit .arr { display: inline-block; transition: transform .2s; }
+.submit:hover { background: var(--red-deep); transform: translateY(-1px); box-shadow: 0 10px 22px rgba(218,31,61,.34); }
+.submit:hover .arr { transform: translateX(4px); }
+.submit:active { transform: translateY(1px); box-shadow: 0 3px 8px rgba(218,31,61,.25); }
+.submit:focus-visible { outline: 3px solid var(--charcoal); outline-offset: 3px; }
+.submit:disabled { cursor: progress; opacity: .85; transform: none; box-shadow: 0 6px 16px rgba(218,31,61,.2); }
+.submit:disabled .arr { display: none; }
+.spinner {
+  display: none; width: 18px; height: 18px; margin-left: 8px; vertical-align: -3px;
+  border: 2.5px solid rgba(255,255,255,.4); border-top-color: var(--on-red); border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+.submit.loading .spinner { display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.alert {
+  font-size: 13.5px; font-weight: 600; color: var(--error); background: var(--error-bg);
+  border-radius: 10px; padding: 11px 13px; word-break: keep-all;
+}
+.alert:empty { display: none; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.note { margin: 2px 0 0; text-align: center; font-size: 12px; color: var(--muted); }
+
+.done { text-align: center; padding: 18px 4px 8px; display: grid; gap: 10px; justify-items: center; }
+.done .check {
+  width: 64px; height: 64px; border-radius: 50%; background: var(--red); color: var(--on-red);
+  display: grid; place-items: center; font-size: 30px; font-weight: 800;
+  animation: pop .45s cubic-bezier(.2,1.4,.4,1) both;
+}
+@keyframes pop { from { transform: scale(.5); } to { transform: scale(1); } }
+.done h2 { margin: 6px 0 0; font-size: 20px; }
+.done p { margin: 0; color: var(--muted); font-size: 14px; word-break: keep-all; }
+.done .summary {
+  margin-top: 8px; width: 100%; text-align: left; font-size: 14px;
+  border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 6px;
+}
+.done .summary div { display: flex; justify-content: space-between; gap: 12px; }
+.done .summary dt { color: var(--muted); }
+.done .summary dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+.again { margin-top: 6px; background: none; border: 0; color: var(--muted); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
+
+footer .wrap { padding-block: 28px 36px; text-align: center; display: grid; gap: 6px; }
+footer .name { font-weight: 700; font-size: 14px; }
+footer .privacy { font-size: 11.5px; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="band">
+  <div class="wrap">
+    <header>
+      <div class="brand">youngjoon<span>.finance</span></div>
+      <div class="sub">AIA프리미어파트너스 조영준</div>
+    </header>
+    <section class="hero">
+      <h1>달러·보험 궁금증,<br>지금 바로 해결해드려요</h1>
+      <p>무료 상담 신청 → <b>24시간 내</b> 연락드립니다</p>
+      <ul class="badges">
+        <li>✅ 무료 상담</li>
+        <li>✅ 24시간 내 회신</li>
+        <li>✅ 맞춤 설계</li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+    <div class="card" id="card">
+      <div id="formView">
+        <h2>무료 상담 신청</h2>
+        <p class="lead">세 가지만 알려주시면 충분해요.</p>
+        <form id="form" novalidate>
+          <div class="field" id="f-name">
+            <label for="name">이름<span class="req">*</span></label>
+            <input id="name" name="name" type="text" autocomplete="name" placeholder="홍길동" maxlength="20">
+            <div class="msg" id="m-name" aria-live="polite"></div>
+          </div>
+          <div class="field" id="f-phone">
+            <label for="phone">연락처<span class="req">*</span></label>
+            <input id="phone" name="phone" type="tel" inputmode="tel" pattern="[0-9\-]+" autocomplete="tel" placeholder="010-1234-5678" maxlength="13">
+            <div class="msg" id="m-phone" aria-live="polite"></div>
+          </div>
+          <div class="field" id="f-topic">
+            <label for="topic">관심 분야<span class="req">*</span></label>
+            <select id="topic" name="topic" required>
+              <option value="" selected disabled>선택해주세요</option>
+              <option>달러보험</option>
+              <option>일반 보험 리모델링</option>
+              <option>은퇴·노후 준비</option>
+              <option>상속·증여</option>
+              <option>비과세 상품</option>
+              <option>기타</option>
+            </select>
+            <div class="msg" id="m-topic" aria-live="polite"></div>
+          </div>
+          <div class="hp" aria-hidden="true">
+            <label for="website">웹사이트</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+          </div>
+          <div class="alert" id="alert" role="alert"></div>
+          <button class="submit" type="submit" id="submit"><span class="label">무료 상담 신청하기</span> <span class="arr">→</span><span class="spinner" aria-hidden="true"></span></button>
+          <p class="note">신청 후 영업일 기준 24시간 안에 직접 연락드려요</p>
+        </form>
+      </div>
+
+      <div class="done" id="doneView" hidden>
+        <div class="check" aria-hidden="true">✓</div>
+        <h2>신청 완료! 24시간 내 연락드릴게요 😊</h2>
+        <p>남겨주신 번호로 조영준이 직접 연락드립니다.</p>
+        <dl class="summary">
+          <div><dt>이름</dt><dd id="s-name"></dd></div>
+          <div><dt>연락처</dt><dd id="s-phone"></dd></div>
+          <div><dt>관심 분야</dt><dd id="s-topic"></dd></div>
+        </dl>
+        <button class="again" type="button" id="again">정보를 잘못 입력했어요</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="name">AIA프리미어파트너스 조영준</div>
+    <div class="privacy">개인정보는 상담 목적 외 사용하지 않습니다.</div>
+  </div>
+</footer>
+
+<script>
+// 구글 Apps Script 웹앱 배포 URL (google_sheets_setup.md 참고)
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwvt5JbHeRKqgCxh-97mlOpbvpAwCnrkHdcGDAlCj0tqpmMGFEyGP_CE5gv5fD0UcXTrQ/exec';
+
+(function () {
+  var form = document.getElementById('form');
+  var phone = document.getElementById('phone');
+  var fields = {
+    name:  { el: document.getElementById('name'),  box: document.getElementById('f-name'),  msg: document.getElementById('m-name') },
+    phone: { el: phone,                             box: document.getElementById('f-phone'), msg: document.getElementById('m-phone') },
+    topic: { el: document.getElementById('topic'), box: document.getElementById('f-topic'), msg: document.getElementById('m-topic') }
+  };
+
+  // 숫자만 남기고 010-1234-5678 형태로 자동 하이픈
+  phone.addEventListener('input', function () {
+    var d = phone.value.replace(/[^0-9]/g, '').slice(0, 11);
+    if (d.length > 7) d = d.slice(0, 3) + '-' + d.slice(3, d.length - 4) + '-' + d.slice(-4);
+    else if (d.length > 3) d = d.slice(0, 3) + '-' + d.slice(3);
+    phone.value = d;
+  });
+
+  function check(key) {
+    var v = fields[key].el.value.trim();
+    if (key === 'name') {
+      if (!v) return '이름을 입력해주세요.';
+      if (v.length < 2) return '이름을 두 글자 이상 입력해주세요.';
+    }
+    if (key === 'phone') {
+      if (!v) return '연락받으실 번호를 입력해주세요.';
+      var d = v.replace(/-/g, '');
+      if (!/^[0-9\-]+$/.test(v) || !/^01[016789][0-9]{7,8}$/.test(d)) return '휴대폰 번호를 확인해주세요. 예: 010-1234-5678';
+    }
+    if (key === 'topic' && !v) return '관심 분야를 하나 선택해주세요.';
+    return '';
+  }
+
+  function show(key, err) {
+    var f = fields[key];
+    f.msg.textContent = err;
+    f.el.setAttribute('aria-invalid', err ? 'true' : 'false');
+    f.box.classList.remove('bad');
+    if (err) { void f.box.offsetWidth; f.box.classList.add('bad'); }
+  }
+
+  Object.keys(fields).forEach(function (key) {
+    var ev = key === 'topic' ? 'change' : 'input';
+    fields[key].el.addEventListener(ev, function () {
+      if (fields[key].box.classList.contains('bad') && !check(key)) show(key, '');
+    });
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var first = null;
+    Object.keys(fields).forEach(function (key) {
+      var err = check(key);
+      show(key, err);
+      if (err && !first) first = fields[key].el;
+    });
+    if (first) { first.focus(); return; }
+
+    var data = {
+      name: fields.name.el.value.trim(),
+      phone: phone.value,
+      topic: fields.topic.el.value,
+      website: document.getElementById('website').value
+    };
+
+    alertBox.textContent = '';
+    setLoading(true);
+
+    // 아직 배포 URL을 넣지 않은 미리보기에서는 저장 없이 완료 화면만 보여줌
+    if (SCRIPT_URL.indexOf('YOUR_SCRIPT_ID') !== -1) {
+      setTimeout(function () { setLoading(false); done(data); }, 600);
+      return;
+    }
+
+    // 폼 형식으로 보내면 CORS 사전요청 없이 Apps Script가 바로 받음
+    fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams(data) })
+      .then(function (res) { return res.json(); })
+      .then(function (json) {
+        if (!json || json.result !== 'success') throw new Error(json && json.message);
+        done(data);
+      })
+      .catch(function () {
+        alertBox.textContent = '신청이 전송되지 않았어요. 잠시 후 다시 시도해주세요.';
+      })
+      .then(function () { setLoading(false); });
+  });
+
+  var alertBox = document.getElementById('alert');
+  var submitBtn = document.getElementById('submit');
+
+  function setLoading(on) {
+    submitBtn.disabled = on;
+    submitBtn.classList.toggle('loading', on);
+    submitBtn.querySelector('.label').textContent = on ? '신청 보내는 중' : '무료 상담 신청하기';
+  }
+
+  function done(data) {
+    document.getElementById('s-name').textContent = data.name;
+    document.getElementById('s-phone').textContent = data.phone;
+    document.getElementById('s-topic').textContent = data.topic;
+    document.getElementById('formView').hidden = true;
+    document.getElementById('doneView').hidden = false;
+    document.getElementById('card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  document.getElementById('again').addEventListener('click', function () {
+    document.getElementById('doneView').hidden = true;
+    document.getElementById('formView').hidden = false;
+    fields.name.el.focus();
+  });
+})();
+</script>
