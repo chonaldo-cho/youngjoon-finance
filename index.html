@@ -30,6 +30,7 @@
   --red-deep: #9E1229; color-scheme: dark;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body {
   background: var(--bg); color: var(--fg); font-family: var(--font);
   font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased;
@@ -146,6 +147,54 @@ footer .wrap { padding-block: 28px 36px; text-align: center; display: grid; gap:
 footer .name { font-weight: 700; font-size: 14px; }
 footer .privacy { font-size: 11.5px; color: var(--muted); }
 
+/* 개인정보 동의 */
+.agree { display: grid; gap: 6px; }
+.agree-row {
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+  background: var(--field); border: 1.5px solid var(--line); border-radius: 12px;
+  transition: border-color .15s, background .15s;
+}
+.agree-row label { display: flex; align-items: center; gap: 10px; flex: 1; font-size: 13.5px; font-weight: 600; cursor: pointer; word-break: keep-all; }
+.agree-row label .req { color: var(--red); margin-left: 0; }
+.agree input[type="checkbox"] {
+  flex: none; width: 20px; height: 20px; margin: 0; padding: 0; border-radius: 6px;
+  border: 1.5px solid var(--muted); background: var(--surface); cursor: pointer;
+  display: grid; place-items: center;
+}
+.agree input[type="checkbox"]:checked { background: var(--red); border-color: var(--red); }
+.agree input[type="checkbox"]:checked::after { content: '✓'; color: var(--on-red); font-size: 13px; font-weight: 800; line-height: 1; }
+.agree input[type="checkbox"]:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(218,31,61,.22); }
+.agree.bad .agree-row { border-color: var(--error); background: var(--error-bg); }
+.agree.bad { animation: nudge .3s; }
+.view-terms {
+  flex: none; background: none; border: 0; padding: 4px 2px; font: inherit; font-size: 12.5px; font-weight: 700;
+  color: var(--red); text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+
+.modal {
+  position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(20,16,17,.55); padding: 16px;
+}
+.modal[hidden] { display: none; }
+.sheet {
+  width: 100%; max-width: 480px; max-height: min(82vh, 640px); display: flex; flex-direction: column;
+  background: var(--surface); color: var(--fg); border-radius: 18px; overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,.3); animation: rise .3s cubic-bezier(.2,.7,.2,1) both;
+}
+@media (min-width: 560px) { .modal { align-items: center; } }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; border-bottom: 3px solid var(--red); }
+.sheet-head h3 { margin: 0; font-size: 16.5px; font-weight: 800; letter-spacing: -0.02em; }
+.x { background: none; border: 0; font: inherit; font-size: 22px; line-height: 1; color: var(--muted); cursor: pointer; padding: 4px 6px; }
+.sheet-body { padding: 16px 18px; overflow-y: auto; font-size: 13.5px; word-break: keep-all; }
+.sheet-body p { margin: 0 0 12px; color: var(--muted); }
+.terms { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+.terms th, .terms td { text-align: left; vertical-align: top; padding: 10px 8px; border-bottom: 1px solid var(--line); }
+.terms th { width: 34%; font-weight: 700; color: var(--fg); white-space: nowrap; }
+.terms td b { color: var(--red); }
+.sheet-body .fine { font-size: 12.5px; margin: 0; }
+.sheet-foot { padding: 12px 18px 16px; border-top: 1px solid var(--line); }
+.sheet-foot .submit { margin-top: 0; font-size: 16px; padding: 14px 16px; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
@@ -203,6 +252,13 @@ footer .privacy { font-size: 11.5px; color: var(--muted); }
             <label for="website">웹사이트</label>
             <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
           </div>
+          <div class="agree" id="f-agree">
+            <div class="agree-row">
+              <label for="agree"><input id="agree" name="agree" type="checkbox" value="Y"><span>개인정보 수집·이용에 동의합니다<span class="req">*</span></span></label>
+              <button class="view-terms" type="button" id="openTerms" aria-haspopup="dialog">[전문보기]</button>
+            </div>
+            <div class="msg" id="m-agree" aria-live="polite"></div>
+          </div>
           <div class="alert" id="alert" role="alert"></div>
           <button class="submit" type="submit" id="submit"><span class="label">무료 상담 신청하기</span> <span class="arr">→</span><span class="spinner" aria-hidden="true"></span></button>
           <p class="note">신청 후 영업일 기준 24시간 안에 직접 연락드려요</p>
@@ -224,10 +280,32 @@ footer .privacy { font-size: 11.5px; color: var(--muted); }
   </div>
 </main>
 
+<div class="modal" id="termsModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+    <div class="sheet-head">
+      <h3 id="termsTitle">개인정보 수집·이용 동의</h3>
+      <button class="x" type="button" id="closeTerms" aria-label="닫기">×</button>
+    </div>
+    <div class="sheet-body">
+      <p>AIA프리미어파트너스 조영준(youngjoon.finance)은 무료 상담 신청을 위해 아래와 같이 개인정보를 수집·이용합니다.</p>
+      <table class="terms">
+        <tr><th>수집 항목</th><td>이름, 연락처(휴대폰 번호)</td></tr>
+        <tr><th>수집 목적</th><td>보험 상담 신청 확인 및 상담 연락</td></tr>
+        <tr><th>보유 기간</th><td><b>상담 완료 후 즉시 파기</b></td></tr>
+        <tr><th>제3자 제공</th><td>제3자에게 제공하지 않습니다</td></tr>
+      </table>
+      <p class="fine">귀하는 개인정보 수집·이용에 동의하지 않을 권리가 있습니다. 다만 동의하지 않으시면 상담 신청이 제한됩니다.</p>
+    </div>
+    <div class="sheet-foot">
+      <button class="submit" type="button" id="agreeTerms">동의하고 닫기</button>
+    </div>
+  </div>
+</div>
+
 <footer>
   <div class="wrap">
     <div class="name">AIA프리미어파트너스 조영준</div>
-    <div class="privacy">개인정보는 상담 목적 외 사용하지 않습니다.</div>
+    <div class="privacy">개인정보는 상담 목적 외 사용하지 않으며, 상담 완료 후 즉시 파기합니다.</div>
   </div>
 </footer>
 
@@ -290,12 +368,16 @@ var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwvt5JbHeRKqgCxh-97mlO
       show(key, err);
       if (err && !first) first = fields[key].el;
     });
+    var agreeErr = agree.checked ? '' : '개인정보 수집·이용에 동의해주셔야 신청할 수 있어요.';
+    showAgree(agreeErr);
+    if (agreeErr && !first) first = agree;
     if (first) { first.focus(); return; }
 
     var data = {
       name: fields.name.el.value.trim(),
       phone: phone.value,
       topic: fields.topic.el.value,
+      agree: 'Y',
       website: document.getElementById('website').value
     };
 
@@ -320,6 +402,39 @@ var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwvt5JbHeRKqgCxh-97mlO
       })
       .then(function () { setLoading(false); });
   });
+
+  // 개인정보 동의 체크박스 + 약관 전문 모달
+  var agree = document.getElementById('agree');
+  var agreeBox = document.getElementById('f-agree');
+  var agreeMsg = document.getElementById('m-agree');
+  var modal = document.getElementById('termsModal');
+  var openBtn = document.getElementById('openTerms');
+
+  function showAgree(err) {
+    agreeMsg.textContent = err;
+    agree.setAttribute('aria-invalid', err ? 'true' : 'false');
+    agreeBox.classList.remove('bad');
+    if (err) { void agreeBox.offsetWidth; agreeBox.classList.add('bad'); }
+  }
+  agree.addEventListener('change', function () { if (agree.checked) showAgree(''); });
+
+  function openTerms() {
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.getElementById('closeTerms').focus();
+  }
+  function closeTerms() {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+    openBtn.focus();
+  }
+  openBtn.addEventListener('click', openTerms);
+  document.getElementById('closeTerms').addEventListener('click', closeTerms);
+  document.getElementById('agreeTerms').addEventListener('click', function () {
+    agree.checked = true; showAgree(''); closeTerms();
+  });
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeTerms(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) closeTerms(); });
 
   var alertBox = document.getElementById('alert');
   var submitBtn = document.getElementById('submit');
