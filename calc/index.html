@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>내 달러 비중 계산기 · youngjoon.finance</title>
+<style>
+:root{--bg:#ECE1D0;--card:#F8F1E6;--navy:#22355A;--sand:#D9C3A0;--text:#5E5446;--muted:#8C7F6C;--hi:#F5C842;--warn:#B5654A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--navy);font-family:'Apple SD Gothic Neo','Malgun Gothic',-apple-system,sans-serif;line-height:1.6;word-break:keep-all}
+main{max-width:480px;margin:0 auto;padding:28px 16px 48px}
+.badge{display:inline-block;background:var(--navy);color:var(--card);font-size:13px;font-weight:700;padding:5px 14px;border-radius:99px}
+h1{font-size:28px;margin:14px 0 4px;letter-spacing:-.03em}
+h1 mark{background:linear-gradient(transparent 58%,var(--hi) 58%);color:inherit}
+.sub{color:var(--text);margin:0 0 20px}
+h2{font-size:18px;margin:26px 0 10px}
+.row{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.tag{flex:none;font-size:12px;font-weight:800;padding:3px 8px;border-radius:6px;background:var(--sand)}
+.tag.usd{background:var(--navy);color:var(--card)}
+.row label{flex:1;font-size:15px;font-weight:600}
+.row input{width:110px;text-align:right;font-size:16px;padding:8px;border:1px solid var(--sand);border-radius:8px;background:#fff;color:var(--navy)}
+.unit{font-size:13px;color:var(--muted)}
+.result{background:var(--navy);color:var(--card);border-radius:16px;padding:18px 20px;margin-top:16px}
+.result .big{font-size:40px;font-weight:800;letter-spacing:-.02em}
+.result .line{font-size:14px;opacity:.85}
+.check{display:flex;gap:10px;align-items:flex-start;background:var(--card);border-radius:12px;padding:12px;margin-bottom:8px;font-weight:600}
+.check input{width:20px;height:20px;margin-top:3px;flex:none}
+#tips{margin-top:12px;padding:0;list-style:none}
+#tips li{background:#fff;border-left:4px solid var(--hi);border-radius:8px;padding:10px 12px;margin-bottom:8px;color:var(--text);font-size:14px}
+.cta{display:block;text-align:center;background:var(--navy);color:var(--card);text-decoration:none;font-weight:700;padding:14px;border-radius:12px;margin-top:22px}
+.note{font-size:12px;color:var(--muted);margin-top:18px}
+</style>
+<main>
+  <span class="badge">달러 Q&amp;A EP.01</span>
+  <h1>내 달러 비중 <mark>계산기</mark></h1>
+  <p class="sub">대략적인 금액만 넣으면 바로 계산돼요. 입력한 숫자는 이 화면에서만 계산되고 어디에도 저장·전송되지 않아요.</p>
+
+  <h2>1. 내 자산 적기 (만 원)</h2>
+  <div id="rows"></div>
+
+  <div class="result" aria-live="polite">
+    <div class="line">내 자산 중 달러 비중</div>
+    <div class="big" id="pct">–</div>
+    <div class="line" id="detail">금액을 넣어 보세요</div>
+  </div>
+
+  <h2>2. 비중을 정하기 전에 체크</h2>
+  <label class="check"><input type="checkbox" id="c1">1년 안에 달러로 쓸 돈(여행·유학·해외결제)이 있어요</label>
+  <label class="check"><input type="checkbox" id="c2">생활비 몇 달 치 비상금이 원화로 따로 있어요</label>
+  <label class="check"><input type="checkbox" id="c3">자산이 한 통화에 몰려 있지 않아요</label>
+  <ul id="tips"></ul>
+
+  <a class="cta" href="https://chonaldo-cho.github.io/youngjoon-finance/?src=calc">내 상황에 맞춰 같이 보기 · 무료 자산 진단</a>
+
+  <p class="note">※ 정답 비율은 없어요. 이 계산기는 지금 비중을 보여 줄 뿐, 얼마가 적당하다고 정해 주지 않아요. 개인 상황에 따라 다르니 상담으로 확인하세요.<br>
+  ※ 달러 자산은 환율이 내리면 원화 기준으로 손실이 날 수 있어요. 특정 상품을 권하는 자료가 아니에요. · @youngjoon.finance</p>
+</main>
+<script>
+const ITEMS = [["원화","예금·적금·파킹통장"],["원화","국내 주식·펀드"],["원화","집·전세보증금"],
+               ["달러","달러 예금"],["달러","달러 ETF·해외 주식"],["달러","그 밖의 달러 자산"]];
+const rows = document.getElementById('rows');
+ITEMS.forEach(([c, n], i) => {
+  rows.insertAdjacentHTML('beforeend',
+    `<div class="row"><span class="tag${c === '달러' ? ' usd' : ''}">${c}</span>
+     <label for="a${i}">${n}</label><input id="a${i}" type="number" inputmode="decimal" min="0" placeholder="0"><span class="unit">만 원</span></div>`);
+});
+const num = i => Math.max(0, parseFloat(document.getElementById('a' + i).value) || 0);
+const won = v => v.toLocaleString('ko-KR') + '만 원';
+
+function update() {
+  const all = ITEMS.reduce((s, _, i) => s + num(i), 0);
+  const usd = ITEMS.reduce((s, [c], i) => s + (c === '달러' ? num(i) : 0), 0);
+  document.getElementById('pct').textContent = all ? (usd / all * 100).toFixed(1) + '%' : '–';
+  document.getElementById('detail').textContent = all ? `전체 ${won(all)} 중 달러 ${won(usd)}` : '금액을 넣어 보세요';
+
+  const tips = [];
+  if (!document.getElementById('c2').checked) tips.push('원화 비상금부터 채워 두는 게 먼저예요. 급할 때 환율과 상관없이 쓸 수 있어야 해요.');
+  if (document.getElementById('c1').checked) tips.push('1년 안에 쓸 달러는 따로 떼어 두세요. 꺼내기 쉬운 곳(예: 예금)이 맞는지 지난 편(EP.02)을 참고해 보세요.');
+  if (!document.getElementById('c3').checked && all) tips.push(usd === 0 ? '지금은 자산이 모두 원화예요. 일부를 다른 통화로 나눌지 생각해 볼 수 있어요.' : '한쪽에 몰려 있다면 비중을 조금씩 나눠 맞춰 가는 방법이 있어요.');
+  if (!tips.length && all) tips.push('기준 3가지를 모두 확인했어요. 이제 지금 비중이 내 목적에 맞는지 살펴보면 돼요.');
+  document.getElementById('tips').innerHTML = tips.map(t => `<li>${t}</li>`).join('');
+}
+document.querySelectorAll('input').forEach(el => el.addEventListener('input', update));
+update();
+</script>
+</html>
